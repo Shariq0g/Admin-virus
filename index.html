@@ -14,7 +14,6 @@
             <li onclick="showPage('dashboard')">Dashboard</li>
             <li onclick="showPage('users')">Users</li>
             <li onclick="showPage('tasks')">Tasks</li>
-            <li onclick="showPage('settings')">Settings</li>
         </ul>
     </div>
 
@@ -56,15 +55,9 @@
                 <tbody></tbody>
             </table>
         </div>
-
-        <div id="settings" class="page">
-            <h1>Settings</h1>
-            <label>Change Theme: </label>
-            <button onclick="changeTheme()">Toggle Theme</button>
-        </div>
     </div>
 
-    <script src="script.js"></script>
-    <script src="firebaseConfig.js"></script>
+    <script src="firebaseConfig.js" type="module"></script>
+    <script src="script.js" type="module"></script>
 </body>
 </html>
