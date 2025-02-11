@@ -1,84 +1,79 @@
-import { db, collection, getDocs, addDoc, deleteDoc, doc } from "./firebaseConfig.js";
+document.addEventListener("DOMContentLoaded", function() {
+    loadDashboard();
+    document.getElementById("dashboard-link").addEventListener("click", loadDashboard);
+    document.getElementById("users-link").addEventListener("click", loadUsers);
+    document.getElementById("tasks-link").addEventListener("click", loadTasks);
+});
 
-// ** Show Pages in Admin Panel **
-function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
-    document.getElementById(pageId).classList.add('active');
-}
+// 📌 Load Dashboard Data
+function loadDashboard() {
+    document.getElementById("users-section").classList.add("hidden");
+    document.getElementById("tasks-section").classList.add("hidden");
 
-// ** Load Dashboard Data **
-async function loadDashboard() {
-    let totalUsers = 0;
-    let totalBalance = 0;
-    let activeTasks = 0;
-
-    const usersSnapshot = await getDocs(collection(db, "users"));
-    usersSnapshot.forEach(doc => {
-        totalUsers++;
-        totalBalance += doc.data().balance || 0;
+    db.collection("users").get().then(snapshot => {
+        document.getElementById("totalUsers").innerText = snapshot.size;
     });
 
-    const tasksSnapshot = await getDocs(collection(db, "tasks"));
-    activeTasks = tasksSnapshot.size;
+    db.collection("tasks").where("status", "==", "active").get().then(snapshot => {
+        document.getElementById("activeTasks").innerText = snapshot.size;
+    });
 
-    document.getElementById("totalUsers").textContent = totalUsers;
-    document.getElementById("totalBalance").textContent = totalBalance;
-    document.getElementById("activeTasks").textContent = activeTasks;
+    db.collection("users").get().then(snapshot => {
+        let totalBalance = 0;
+        snapshot.forEach(doc => {
+            totalBalance += doc.data().balance || 0;
+        });
+        document.getElementById("totalBalance").innerText = totalBalance;
+    });
 }
 
-// ** Load Users Data **
-async function loadUsers() {
-    const usersSnapshot = await getDocs(collection(db, "users"));
-    let usersTable = document.querySelector("#usersTable tbody");
+// 📌 Load Users List
+function loadUsers() {
+    document.getElementById("users-section").classList.remove("hidden");
+    document.getElementById("tasks-section").classList.add("hidden");
+
+    let usersTable = document.getElementById("usersTable");
     usersTable.innerHTML = "";
 
-    usersSnapshot.forEach(doc => {
-        let user = doc.data();
-        let row = `<tr>
-            <td>${user.username}</td>
-            <td>${user.balance}</td>
-            <td><button onclick="deleteUser('${doc.id}')">Delete</button></td>
-        </tr>`;
-        usersTable.innerHTML += row;
+    db.collection("users").get().then(snapshot => {
+        snapshot.forEach(doc => {
+            let data = doc.data();
+            let row = `<tr><td>${data.username}</td><td>${data.balance || 0}</td></tr>`;
+            usersTable.innerHTML += row;
+        });
     });
 }
 
-// ** Delete User **
-async function deleteUser(userId) {
-    await deleteDoc(doc(db, "users", userId));
-    alert("User deleted!");
-    loadUsers();
-}
+// 📌 Load Tasks
+function loadTasks() {
+    document.getElementById("users-section").classList.add("hidden");
+    document.getElementById("tasks-section").classList.remove("hidden");
 
-// ** Load Tasks Data **
-async function loadTasks() {
-    const tasksSnapshot = await getDocs(collection(db, "tasks"));
-    let tasksTable = document.querySelector("#tasksTable tbody");
-    tasksTable.innerHTML = "";
+    let tasksList = document.getElementById("tasksList");
+    tasksList.innerHTML = "";
 
-    tasksSnapshot.forEach(doc => {
-        let task = doc.data();
-        let row = `<tr>
-            <td>${task.name}</td>
-            <td>${task.timeLimit} mins</td>
-            <td><button onclick="deleteTask('${doc.id}')">Delete</button></td>
-        </tr>`;
-        tasksTable.innerHTML += row;
+    db.collection("tasks").get().then(snapshot => {
+        snapshot.forEach(doc => {
+            let data = doc.data();
+            let item = `<li>${data.title} - ${data.status}</li>`;
+            tasksList.innerHTML += item;
+        });
     });
 }
 
-// ** Delete Task **
-async function deleteTask(taskId) {
-    await deleteDoc(doc(db, "tasks", taskId));
-    alert("Task deleted!");
-    loadTasks();
-}
+// 📌 Add Task
+function addTask() {
+    let taskTitle = prompt("Enter Task Title:");
+    if (!taskTitle) return;
 
-// ** Load All Data on Startup **
-window.onload = function() {
-    loadDashboard();
-    loadUsers();
-    loadTasks();
-};
+    db.collection("tasks").add({
+        title: taskTitle,
+        status: "active",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        alert("Task Added!");
+        loadTasks();
+    }).catch(error => {
+        console.error("Error adding task:", error);
+    });
+}
