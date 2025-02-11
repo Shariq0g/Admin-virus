@@ -61,3 +61,8 @@
     <script src="script.js" type="module"></script>
 </body>
 </html>
+<script>
+    window.onerror = function(message, source, lineno, colno, error) {
+        alert("Error: " + message + "\nSource: " + source + "\nLine: " + lineno);
+    };
+</script>
