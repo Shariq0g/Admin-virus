@@ -1,9 +1,9 @@
 body {
-    font-family: Arial, sans-serif;
     display: flex;
-    margin: 0;
+    font-family: Arial, sans-serif;
     background-color: black;
     color: white;
+    margin: 0;
 }
 
 .sidebar {
@@ -14,7 +14,7 @@ body {
 }
 
 .sidebar h2 {
-    color: #0f0;
+    color: limegreen;
 }
 
 .sidebar ul {
@@ -24,34 +24,25 @@ body {
 
 .sidebar ul li {
     padding: 10px;
-    cursor: pointer;
-    color: white;
 }
 
-.sidebar ul li:hover {
-    background: #0a0;
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
 }
 
 .main-content {
-    flex-grow: 1;
+    flex: 1;
     padding: 20px;
-}
-
-.page {
-    display: none;
-}
-
-.page.active {
-    display: block;
-}
-
-.cards {
-    display: flex;
-    gap: 10px;
 }
 
 .card {
     background: #222;
-    padding: 20px;
-    border-radius: 5px;
+    padding: 10px;
+    margin: 10px;
+    display: inline-block;
+}
+
+.hidden {
+    display: none;
 }
