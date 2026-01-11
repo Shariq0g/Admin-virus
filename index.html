@@ -1,134 +1,110 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Taskara Clicker</title>
+<meta charset="UTF-8" />
+<title>Taskara Mini Clicker</title>
 
-<!-- TASKARA SDK -->
-<script src="https://cdn.taskara.com/sdk/v1.js"></script>
+<!-- Taskara SDK -->
+<script src="https://taskara.com/sdk/v1.js"></script>
 
 <style>
     body {
         margin: 0;
         padding: 0;
-        background: linear-gradient(180deg, #000000, #0a0a0a);
-        font-family: Arial, sans-serif;
+        background: #0a0a0a;
         color: #fff;
         text-align: center;
-        user-select: none;
+        font-family: Arial, sans-serif;
     }
-
-    #main {
+    #box {
         margin-top: 40px;
-        padding: 20px;
     }
-
+    #username, #userid {
+        margin-top: 5px;
+        font-size: 16px;
+        opacity: 0.8;
+    }
     #avatar {
-        width: 100px;
-        height: 100px;
+        margin-top: 20px;
+        width: 90px;
+        height: 90px;
         border-radius: 50%;
-        margin-top: 10px;
         border: 3px solid #ffd700;
-        box-shadow: 0 0 20px #ffd700;
+        box-shadow: 0 0 18px #ffd700;
     }
-
     #score {
-        font-size: 60px;
-        font-weight: bold;
-        margin-top: 15px;
-        background: linear-gradient(90deg, #ffcf33, #ffaa00);
+        margin-top: 20px;
+        font-size: 48px;
+        background: linear-gradient(90deg, #ffcf33, #ff9900);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        font-weight: bold;
     }
-
     #tapBtn {
-        width: 200px;
-        height: 200px;
+        width: 180px;
+        height: 180px;
         border-radius: 50%;
         border: none;
         margin-top: 25px;
-        background: radial-gradient(circle, #ffe066, #ff9900);
-        box-shadow: 0 0 30px #ffcc00;
-        font-size: 26px;
+        font-size: 24px;
         font-weight: bold;
-        color: #000;
+        color: #111;
+        background: radial-gradient(circle, #ffe066, #ff9900);
+        box-shadow: 0 0 25px #ffcc00;
         cursor: pointer;
         transition: 0.1s;
     }
-
     #tapBtn:active {
         transform: scale(0.90);
-        box-shadow: 0 0 10px #ffaa00;
-    }
-
-    .infoBox {
-        margin-top: 25px;
-        padding: 10px;
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 14px;
-        width: 260px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    #warn {
-        margin-top: 40px;
-        font-size: 12px;
-        color: #ff4444;
-        opacity: 0.8;
     }
 </style>
 
 </head>
 <body>
 
-<div id="main">
-    <h1>Taskara Clicker Mini-App</h1>
+<div id="box">
+    <h1>Taskara Clicker</h1>
 
-    <img id="avatar" src="">
+    <img id="avatar" src="" alt="avatar">
 
-    <div class="infoBox">
-        <div id="username">Loading...</div>
-        <div id="userid"></div>
-    </div>
+    <div id="username">Loading...</div>
+    <div id="userid"></div>
 
     <h1 id="score">0</h1>
 
     <button id="tapBtn">TAP</button>
-
-    <p id="warn">
-        ⚠️ If anything suspicious is detected, your account, IP and device may be permanently banned.
-    </p>
 </div>
 
 <script>
     let score = 0;
 
-    // INIT SDK
-    Taskara.init({ appId: "tkr_live_l3zsqbsr_mk9l53rs" }); "https://yourapp.com/callback"
+    // Initialize Taskara SDK
+    Taskara.init({
+        appId: "tkr_live_t6093re2_mk9l8wbd"
+        callback: "https://yourapp.com"
     });
 
-    // VERIFY USER
-    Taskara.getUser()
-        .then(user => {
-            document.getElementById("username").innerText = "@"+user.username;
-            document.getElementById("userid").innerText = "User ID: "+user.userId;
+    // Verify user identity
+    async function loadUser() {
+        try {
+            const user = await Taskara.getUser();
+            document.getElementById("username").textContent = "@" + user.username;
+            document.getElementById("userid").textContent = "User ID: " + user.userId;
             document.getElementById("avatar").src = user.avatar;
-        })
-        .catch(err => {
-            alert("User verification failed. Cannot continue.");
-            console.error(err);
-        });
+        } catch (err) {
+            console.error("Verification failed:", err);
+            alert("Could not verify Taskara identity.");
+        }
+    }
+    loadUser();
 
-    // CLICK BUTTON
+    // Click button logic
     document.getElementById("tapBtn").addEventListener("click", () => {
         score++;
-        document.getElementById("score").innerText = score;
+        document.getElementById("score").textContent = score;
 
-        // SEND TASK COMPLETION
         Taskara.completeTask({
-            taskId: "click_event",
+            taskId: "clicker_01",
             points: 1
         });
     });
